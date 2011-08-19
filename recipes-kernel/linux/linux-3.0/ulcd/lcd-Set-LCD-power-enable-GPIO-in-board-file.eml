@@ -1,0 +1,93 @@
+Received: from dflp51.itg.ti.com (128.247.22.94) by dfle71.ent.ti.com
+ (128.247.5.62) with Microsoft SMTP Server id 14.1.323.3; Thu, 18 Aug 2011
+ 16:20:16 -0500
+Received: from medina.ext.ti.com (medina.ext.ti.com [192.91.81.31])	by
+ dflp51.itg.ti.com (8.13.7/8.13.8) with ESMTP id p7ILKGO6027015;	Thu, 18 Aug
+ 2011 16:20:16 -0500 (CDT)
+Received: from psmtp.com (na3sys009amx237.postini.com [74.125.149.121])	by
+ medina.ext.ti.com (8.13.7/8.13.7) with SMTP id p7ILKEGV022138
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO);	Thu, 18
+ Aug 2011 16:20:15 -0500
+Received: from mail-gw0-f44.google.com ([74.125.83.44]) (using TLSv1) by
+ na3sys009amx237.postini.com ([74.125.148.10]) with SMTP;	Thu, 18 Aug 2011
+ 21:20:15 GMT
+Received: by mail-gw0-f44.google.com with SMTP id 20so1795458gwb.17        for
+ <multiple recipients>; Thu, 18 Aug 2011 14:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=from:to:cc:subject:date:message-id:x-mailer:to;
+        bh=mlO4rjFmkzRMnrhhsfu4anyqiGVR0mfhw8disZTMggI=;
+        b=XpmCdVu85QAFxt+f5UO9s0ydtoTSA6cX3WkfODm1HLusGTYtuKWP8bri6FZdV3OCHY
+         CurUDzbnIAGqr4lB6FaSbcLRBuId09NJZoxxAIiJn4m3b+AsvvqKnp+0UukUbvgVMGcE
+         TzKUD3ZN/ctVJueHCmGFhsOYJqW6ZC+IOwTok=
+Received: by 10.236.176.67 with SMTP id a43mr1382161yhm.54.1313702414483;
+        Thu, 18 Aug 2011 14:20:14 -0700 (PDT)
+Received: from localhost.localdomain (dragon.ti.com [192.94.94.33])        by
+ mx.google.com with ESMTPS id b24sm219554yhm.11.2011.08.18.14.20.12
+        (version=TLSv1/SSLv3 cipher=OTHER);        Thu, 18 Aug 2011 14:20:13
+ -0700 (PDT)
+From: Joel A Fernandes <agnel.joel@gmail.com>
+To: <beagleboard@googlegroups.com>, <beagleboard@googlegroups.com>
+CC: Joel A Fernandes <agnel.joel@gmail.com>, <jdk@ti.com>, <k-kooi@ti.com>,
+	"Coley, Gerald" <g-coley1@ti.com>, "Monk, Roger" <r-monk@ti.com>, "Porter,
+ Matt" <mporter@ti.com>
+Subject: [PATCH v2] lcd: Set LCD power-enable GPIO in board file
+Date: Thu, 18 Aug 2011 16:19:40 -0500
+Message-ID: <1313702380-6539-1-git-send-email-agnel.joel@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-pstn-neptune: 0/0/0.00/0
+X-pstn-levels: (S:31.84097/99.90000 CV:99.9000 FC:95.5390 LC:95.5390 R:95.9108 P:95.9108 M:97.0282 C:98.6951 )
+X-pstn-settings: 2 (0.5000:0.0750) s cv GT3 gt2 gt1 r p m 
+X-pstn-addresses: from <agnel.joel@gmail.com> [db-null] 
+Content-Type: text/plain
+Return-Path: agnel.joel@gmail.com
+X-MS-Exchange-Organization-AuthSource: DFLE71.ent.ti.com
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 10
+X-MS-Exchange-Organization-AVStamp-Mailbox: SYMANTEC;420610240;0;info
+MIME-Version: 1.0
+
+With this, the ULCD-lite display works with the 3.0 kernel
+
+v2 changes:
+Fixed the beagle_config structure
+
+Signed-off-by: Joel A Fernandes <agnel.joel@gmail.com>
+---
+ arch/arm/mach-omap2/board-omap3beagle.c |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
+
+diff --git a/arch/arm/mach-omap2/board-omap3beagle.c b/arch/arm/mach-omap2/board-omap3beagle.c
+index d49c1e2..08f06ff 100644
+--- a/arch/arm/mach-omap2/board-omap3beagle.c
++++ b/arch/arm/mach-omap2/board-omap3beagle.c
+@@ -90,12 +90,14 @@ static struct {
+ 	int reset_gpio;
+ 	int usr_button_gpio;
+ 	char *lcd_driver_name;
++	int lcd_pwren;
+ } beagle_config = {
+ 	.mmc1_gpio_wp = -EINVAL,
+ 	.usb_pwr_level = GPIOF_OUT_INIT_LOW,
+ 	.reset_gpio = 129,
+ 	.usr_button_gpio = 4,
+ 	.lcd_driver_name = "",
++	.lcd_pwren = 156
+ };
+ 
+ static struct gpio omap3_beagle_rev_gpios[] __initdata = {
+@@ -428,6 +430,11 @@ static void __init beagle_display_init(void)
+ {
+ 	int r;
+ 
++	r = gpio_request_one(beagle_config.lcd_pwren, GPIOF_OUT_INIT_LOW,
++			     "LCD power");
++	if (r < 0)
++		printk(KERN_ERR "Unable to get LCD power enable GPIO\n");
++
+ 	r = gpio_request_one(beagle_dvi_device.reset_gpio, GPIOF_OUT_INIT_LOW,
+ 			     "DVI reset");
+ 	if (r < 0)
+-- 
+1.7.1
+
