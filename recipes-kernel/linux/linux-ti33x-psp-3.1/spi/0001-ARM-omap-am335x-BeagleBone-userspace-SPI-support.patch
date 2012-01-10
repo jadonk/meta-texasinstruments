@@ -1,0 +1,61 @@
+From 57f049f5d815dcaa18563eb6789e05026ea1151a Mon Sep 17 00:00:00 2001
+From: Craig Berscheidt <craig.berscheidt@gmail.com>
+Date: Sun, 1 Jan 2012 15:26:11 -0600
+Subject: [PATCH] ARM:omap:am335x: BeagleBone userspace SPI support
+
+This patch configures the pinmux and registers the userspace SPI driver so that
+the on SPI interface on the BeagleBone expansion header can be accessed from
+userspace using the spidev interface.
+
+Signed-off-by: Craig Berscheidt <craig.berscheidt@gmail.com>
+---
+ arch/arm/mach-omap2/board-am335xevm.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
+
+diff --git a/arch/arm/mach-omap2/board-am335xevm.c b/arch/arm/mach-omap2/board-am335xevm.c
+index 8e1521c..3366182 100644
+--- a/arch/arm/mach-omap2/board-am335xevm.c
++++ b/arch/arm/mach-omap2/board-am335xevm.c
+@@ -1120,6 +1120,16 @@ static struct spi_board_info am335x_spi1_slave_info[] = {
+ 	},
+ };
+ 
++static struct spi_board_info bone_am335x_slave_info[] = {
++	{
++		.modalias      = "spidev",
++		.irq           = -1,
++		.max_speed_hz  = 12000000,
++		.bus_num       = 2,
++		.chip_select   = 0,
++	},
++};
++
+ static void evm_nand_init(int evm_id, int profile)
+ {
+ 	setup_pin_mux(nand_pin_mux);
+@@ -1422,6 +1432,14 @@ static void spi1_init(int evm_id, int profile)
+ 	return;
+ }
+ 
++/* setup beaglebone spi1 */
++static void bone_spi1_init(int evm_id, int profile)
++{
++	setup_pin_mux(spi1_pin_mux);
++	spi_register_board_info(bone_am335x_slave_info,
++			ARRAY_SIZE(bone_am335x_slave_info));
++	return;
++}
+ 
+ static int beaglebone_phy_fixup(struct phy_device *phydev)
+ {
+@@ -1580,6 +1598,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
+ 	{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+ 	{boneleds_init,	DEV_ON_BASEBOARD, PROFILE_ALL},
+ 	{bone_tsc_init, 	DEV_ON_BASEBOARD, PROFILE_ALL},
++	{bone_spi1_init,	DEV_ON_BASEBOARD, PROFILE_ALL},
+ 	{NULL, 0, 0},
+ };
+ 
+-- 
+1.7.5.4
+

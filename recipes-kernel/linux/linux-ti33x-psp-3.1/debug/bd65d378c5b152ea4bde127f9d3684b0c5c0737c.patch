@@ -1,0 +1,27 @@
+From bd65d378c5b152ea4bde127f9d3684b0c5c0737c Mon Sep 17 00:00:00 2001
+From: Bjoern Krombholz <b.krombholz@pironex.de>
+Date: Thu, 3 Nov 2011 13:06:21 +0100
+Subject: [PATCH] net: smsc phy: disable energy detect power for LAN87x0
+
+- link detection isn't reliable when the automatic power down
+  via link energy detection is enabled
+---
+ drivers/net/phy/smsc.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
+index 342505c..57e4fc4 100644
+--- a/drivers/net/phy/smsc.c
++++ b/drivers/net/phy/smsc.c
+@@ -188,7 +188,7 @@ static int lan911x_config_init(struct phy_device *phydev)
+ 	/* basic functions */
+ 	.config_aneg	= genphy_config_aneg,
+ 	.read_status	= genphy_read_status,
+-	.config_init	= smsc_phy_config_init,
++	.config_init	= lan911x_config_init,
+ 
+ 	/* IRQ related */
+ 	.ack_interrupt	= smsc_phy_ack_interrupt,
+-- 
+1.7.5.4
+
