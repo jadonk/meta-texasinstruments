@@ -6,7 +6,7 @@ require cloud9-image.bb
 
 # SoC specific packages, mostly 3D or multimedia related
 SOCSUPPORT = ""
-SOCSUPPORT_omap3 = "xbmc libgles-omap3-x11demos gstreamer-ti omapfbplay"
+SOCSUPPORT_omap3 = "libgles-omap3-x11demos gstreamer-ti omapfbplay"
 SOCSUPPORT_ti33x = "gst-ffmpeg mplayer2"
 
 IMAGE_INSTALL += " \
@@ -18,6 +18,9 @@ IMAGE_INSTALL += " \
                   cheese \
                   florence \
                   man \
+                  xbmc \
+                  mpd \
+		  dosfstools \
                  "
 
 export IMAGE_BASENAME = "Cloud9-IDE-GNOME"
