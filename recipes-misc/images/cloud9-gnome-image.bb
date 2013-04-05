@@ -14,6 +14,7 @@ IMAGE_INSTALL += " \
                   ${SOCSUPPORT} \
                   ttf-dejavu-sans ttf-dejavu-sans-mono ttf-dejavu-common \
                   xinput-calibrator \
+                  chromium \
                   xterm \
                   cheese \
                   florence \
